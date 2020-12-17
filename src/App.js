@@ -1,58 +1,69 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
-  );
-}
+
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    setInterval(() => {
+      fetch("/api/books")
+        .then(res => res.json())
+        .then(data => {
+          setBooks(data);
+        })
+        }, 2000)
+    }, [])
+
+
+
+    const addBook = () => {
+      const title = prompt("Enter your title");
+      const author = prompt("enter author name");
+
+      if (!title || !author)
+        return false;
+
+      fetch("/api/add", {
+        method: "POST",
+        body: JSON.stringify({ title, author })
+      }).catch((error) => {
+        console.log("Error", error);
+      })
+        
+      
+        
+    }
+  
+
+    if (!books.length) {
+      return <h1>Loading...!</h1>
+    }
+
+    return (
+      <div className="App">
+        <h2 className="center"> Available Books</h2>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Auhtor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {books.map((bookObj, ind) => {
+              return (<tr key={ind}>
+                <td>{bookObj.title} </td>
+                <td>{bookObj.author}</td>
+              </tr>
+              )
+            })}
+          </tbody>
+        </table>
+
+        <button onClick={addBook}> ADD bUTTON</button>
+      </div>
+    );
+  }
 
 export default App;
